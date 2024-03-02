@@ -1,13 +1,21 @@
 {
   "name": "rag-citation-coverage-auditor",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Measure whether generated answers cite approved retrieval sources completely.",
   "type": "module",
+  "bin": {
+    "rag-citation-coverage-auditor": "./bin/rag-citation-coverage-auditor.mjs"
+  },
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test"
+    "lint": "for f in src/*.mjs bin/*.mjs test/*.mjs; do node --check \"$f\" || exit 1; done",
+    "test": "node --test",
+    "examples": "npm run example && npm run example:failing",
+    "example": "node bin/rag-citation-coverage-auditor.mjs --input examples/passing.json --scope public --as-of 2026-09-20 --json > /dev/null",
+    "example:failing": "node bin/rag-citation-coverage-auditor.mjs --input examples/failing.json --scope public --as-of 2026-09-20 --json > /dev/null; test $? -eq 1",
+    "check": "npm run lint && npm test && npm run examples && npm pack --dry-run"
   },
   "license": "MIT",
   "repository": {

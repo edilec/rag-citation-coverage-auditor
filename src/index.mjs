@@ -176,43 +176,43 @@ function auditCore(exported, { scope, asOf, maxAgeDays, checkDeadline }) {
         continue
       }
       resolved += 1
+      let usableHere = true
+      let unknownHere = false
       if (typeof source.approved !== 'boolean') {
         findings.push(finding('approval-unknown', pointer, 'Source approval was not declared.'))
-        usableUnknown = true
-        supportUnknown = true
-        continue
-      }
-      if (!source.approved) {
+        unknownHere = true
+      } else if (!source.approved) {
         findings.push(finding('source-unapproved', pointer, 'Cited source is not approved.'))
-        continue
+        usableHere = false
       }
       if (!Array.isArray(source.permissions)) {
         findings.push(finding('permission-unknown', pointer, 'Cited source has no declared permission scopes.'))
-        usableUnknown = true
-        supportUnknown = true
-        continue
-      }
-      if (!source.permissions.includes(scope)) {
+        unknownHere = true
+      } else if (!source.permissions.includes(scope)) {
         findings.push(finding('permission-denied', pointer, 'Cited source does not permit the declared scope.'))
-        continue
+        usableHere = false
       }
       const observedDay = utcDay(source.observedAt)
       const age = observedDay === null ? null : utcDay(asOf) - observedDay
       if (age === null || age < 0) {
         findings.push(finding('freshness-unknown', pointer, 'Cited source freshness could not be determined at the declared date.'))
-        usableUnknown = true
-        supportUnknown = true
-        continue
-      }
-      if (age > maxAgeDays) {
+        unknownHere = true
+      } else if (age > maxAgeDays) {
         findings.push(finding('source-stale', pointer, `Cited source age ${age} days exceeds the ${maxAgeDays}-day policy.`))
-        continue
+        usableHere = false
       }
-      usable += 1
       if (!Array.isArray(source.supportsClaims)) {
         findings.push(finding('support-unknown', pointer, 'Cited source has no declared claim-support relations.'))
         supportUnknown = true
-      } else if (source.supportsClaims.includes(claim.id)) supported = true
+      }
+      if (unknownHere) {
+        usableUnknown = true
+        supportUnknown = true
+      }
+      if (usableHere && !unknownHere) {
+        usable += 1
+        if (source.supportsClaims?.includes(claim.id)) supported = true
+      }
     }
     if (supported) covered += 1
     else if (supportUnknown) coveredUnknown = true

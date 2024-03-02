@@ -38,6 +38,18 @@ test('a fabricated ID in a complete inventory fails, never counts as resolved', 
   assert.deepEqual(report.coverage.coveredClaims, { numerator: 0, denominator: 1 })
 })
 
+test('a fabricated citation fails on its own even when another citation covers the claim', () => {
+  const input = goodExport()
+  input.claims[0].citations.push('FABRICATED')
+  const report = auditCitations(input, options)
+  assert.equal(report.status, 'fail')
+  assert.equal(exitCodeFor(report), 1)
+  assert.deepEqual(ids(report), ['citation-unresolved'])
+  assert.equal(report.findings[0].severity, 'error')
+  assert.deepEqual(report.coverage.coveredClaims, { numerator: 1, denominator: 1 })
+  assert.deepEqual(report.coverage.resolvedCitations, { numerator: 1, denominator: 2 })
+})
+
 test('source presence without explicit claim support is uncovered, not a pass', () => {
   const input = goodExport()
   input.sources[0].supportsClaims = []
@@ -94,6 +106,18 @@ test('known unapproved, denied and stale sources fail rather than become permiss
   }
 })
 
+test('known denial does not hide independently missing permission and freshness evidence', () => {
+  const input = goodExport()
+  input.sources[0].approved = false
+  delete input.sources[0].permissions
+  delete input.sources[0].observedAt
+  const report = auditCitations(input, options)
+  assert.equal(report.status, 'incomplete')
+  assert.deepEqual(ids(report), ['freshness-unknown', 'permission-unknown', 'source-unapproved'])
+  assert.deepEqual(report.coverage.usableCitations, { numerator: null, denominator: 1 })
+  assert.deepEqual(report.coverage.coveredClaims, { numerator: null, denominator: 1 })
+})
+
 test('freshness stays silent at exactly N days and fails at N+1', () => {
   const input = goodExport()
   assert.equal(auditCitations(input, { ...options, maxAgeDays: 5 }).status, 'pass')
@@ -114,4 +138,24 @@ test('multiple claims and references keep explicit, independently counted denomi
     coveredClaims: { numerator: 2, denominator: 2 },
   })
   assert.equal(renderReport(report), renderReport(auditCitations(input, options)))
+})
+
+test('deadline after an observed claim withholds partial semantic findings and denominators', () => {
+  const input = goodExport()
+  input.claims.push({ id: 'C2', citations: ['SRC1'] })
+  let supportReads = 0
+  Object.defineProperty(input.sources[0], 'supportsClaims', {
+    enumerable: true,
+    get() { supportReads += 1; return ['C2'] },
+  })
+  const report = auditCitations(input, {
+    ...options, limits: { timeoutMs: 1 },
+    now: () => (supportReads >= 8 ? 2 : 0),
+  })
+  assert.ok(supportReads >= 8, `analysis did not reach a citation: ${supportReads}`)
+  assert.equal(report.status, 'incomplete')
+  assert.equal(exitCodeFor(report), 2)
+  assert.deepEqual(ids(report), ['analysis-timeout'])
+  assert.deepEqual(report.coverage.coveredClaims, { numerator: null, denominator: null })
+  assert.equal(report.summary.checked, 0)
 })
