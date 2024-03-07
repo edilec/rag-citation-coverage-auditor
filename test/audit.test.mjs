@@ -26,6 +26,26 @@ test('an explicitly supporting, approved, permitted, fresh citation passes witho
   assert.equal(renderReport(report).endsWith('\n'), true)
 })
 
+test('shared in-memory metadata is valid while a genuine cycle is incomplete', () => {
+  const input = goodExport()
+  const second = { ...input.sources[0], id: 'SRC2' }
+  input.sources.push(second)
+  second.permissions = input.sources[0].permissions
+  second.supportsClaims = input.sources[0].supportsClaims
+  input.claims[0].citations.push('SRC2')
+  const shared = auditCitations(input, options)
+  assert.equal(shared.status, 'pass')
+  assert.deepEqual(shared.findings, [])
+  assert.deepEqual(shared.coverage.resolvedCitations, { numerator: 2, denominator: 2 })
+  const roundTrip = auditCitations(JSON.parse(JSON.stringify(input)), options)
+  assert.deepEqual(shared, roundTrip)
+
+  input.extra = input
+  const cyclic = auditCitations(input, options)
+  assert.equal(cyclic.status, 'incomplete')
+  assert.deepEqual(ids(cyclic), ['input-invalid'])
+})
+
 test('a fabricated ID in a complete inventory fails, never counts as resolved', () => {
   const input = goodExport()
   input.claims[0].citations = ['FABRICATED']

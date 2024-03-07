@@ -97,14 +97,16 @@ function incomplete(ruleId, pointer, message, scope, asOf, maxAgeDays) {
 function inspectExport(exported, limits, checkDeadline) {
   if (exported === null || typeof exported !== 'object' || Array.isArray(exported)) return ['input-invalid', '', 'Export must be an object.']
   const pending = [{ value: exported, depth: 1 }]
-  const seen = new WeakSet()
+  const active = new WeakSet()
   while (pending.length > 0) {
     checkDeadline()
-    const { value, depth } = pending.pop()
+    const { value, depth, leaving } = pending.pop()
+    if (leaving) { active.delete(value); continue }
     if (depth > limits.maxDepth) return ['depth-limit-exceeded', '', `Export nesting exceeds ${limits.maxDepth}.`]
     if (value === null || typeof value !== 'object') continue
-    if (seen.has(value)) return ['input-invalid', '', 'Export has a cycle or repeated object.']
-    seen.add(value)
+    if (active.has(value)) return ['input-invalid', '', 'Export has a cycle.']
+    active.add(value)
+    pending.push({ value, leaving: true })
     for (const child of Object.values(value)) if (child !== null && typeof child === 'object') pending.push({ value: child, depth: depth + 1 })
   }
   if (exported.schemaVersion !== SCHEMA_VERSION || !Array.isArray(exported.sources) || !Array.isArray(exported.claims)
