@@ -101,6 +101,8 @@ over any known failure in aggregate status.
 | `--timeout-ms` | 30000 | Elapsed processing time after configuration. |
 | `--max-age-days` | 30 | Policy age in whole UTC days; zero allowed. |
 
+Ambiguous JSON objects with duplicate keys are incomplete, including escaped
+spellings of the same key; an earlier declaration cannot be overwritten.
 Input bounds stay silent at N and return incomplete at N+1. Library callers
 use camelCase `limits` keys and may inject `now` for an exact deadline; the
 clock is never printed. Unknown limit names are invalid configuration. Time

@@ -1,5 +1,6 @@
 import { constants } from 'node:fs'
 import { open } from 'node:fs/promises'
+import { hasDuplicateObjectKeys } from './json.mjs'
 
 export const TOOL_ID = 'rag-citation-coverage-auditor'
 export const SCHEMA_VERSION = '1'
@@ -282,7 +283,9 @@ export async function auditFile(path, { scope, asOf, maxAgeDays = 30, limits: ov
     if (used > limits.maxBytes) return incomplete('byte-limit-exceeded', '', `Input exceeds ${limits.maxBytes} bytes.`, scope, asOf, maxAgeDays)
     let exported
     try {
-      exported = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(buffer.subarray(0, used)))
+      const text = new TextDecoder('utf-8', { fatal: true }).decode(buffer.subarray(0, used))
+      exported = JSON.parse(text)
+      if (hasDuplicateObjectKeys(text)) return incomplete('input-invalid', '', 'Input has duplicate JSON keys.', scope, asOf, maxAgeDays)
     } catch {
       return incomplete('input-invalid', '', 'Input is not valid UTF-8 JSON.', scope, asOf, maxAgeDays)
     }
