@@ -58,6 +58,28 @@ test('a fabricated ID in a complete inventory fails, never counts as resolved', 
   assert.deepEqual(report.coverage.coveredClaims, { numerator: 0, denominator: 1 })
 })
 
+test('a complete empty source inventory proves a fabricated citation absent', () => {
+  const input = goodExport()
+  input.sources = []
+  input.claims[0].citations = ['FABRICATED']
+  const report = auditCitations(input, options)
+  assert.equal(report.status, 'fail')
+  assert.equal(exitCodeFor(report), 1)
+  assert.deepEqual(ids(report), ['claim-uncovered', 'citation-unresolved'])
+  assert.deepEqual(report.coverage.resolvedCitations, { numerator: 0, denominator: 1 })
+  assert.deepEqual(report.coverage.usableCitations, { numerator: 0, denominator: 1 })
+  assert.deepEqual(report.coverage.coveredClaims, { numerator: 0, denominator: 1 })
+
+  input.inventoryComplete = false
+  const unknown = auditCitations(input, options)
+  assert.equal(unknown.status, 'incomplete')
+  assert.deepEqual(ids(unknown), ['inventory-unknown'])
+  assert.deepEqual(unknown.coverage.resolvedCitations, { numerator: null, denominator: 1 })
+
+  input.claims = []
+  assert.deepEqual(ids(auditCitations(input, options)), ['input-invalid'])
+})
+
 test('a fabricated citation fails on its own even when another citation covers the claim', () => {
   const input = goodExport()
   input.claims[0].citations.push('FABRICATED')

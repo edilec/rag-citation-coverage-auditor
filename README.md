@@ -52,8 +52,10 @@ future `observedAt` is unknown freshness, not fresh. The operator must supply
 `--as-of YYYY-MM-DD`; the tool never reads the calendar for the audit date.
 
 `inventoryComplete: true` lets an absent citation ID be called fabricated
-relative to this export and fail. If completeness is false or omitted, an
-absent ID remains unresolved evidence, so the run is incomplete. A source in
+relative to this export and fail. An empty, declared-complete source list is
+valid evidence of absence; an empty claim list is not an audit. If completeness
+is false or omitted, an absent ID remains unresolved evidence, so the run is
+incomplete. A source in
 the inventory with an explicit empty `supportsClaims` list is known not to
 support the declared claim. At least one cited, approved, permitted, fresh
 source must explicitly list the claim ID to cover it. Empty citation lists

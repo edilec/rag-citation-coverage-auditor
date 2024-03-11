@@ -111,7 +111,7 @@ function inspectExport(exported, limits, checkDeadline) {
     for (const child of Object.values(value)) if (child !== null && typeof child === 'object') pending.push({ value: child, depth: depth + 1 })
   }
   if (exported.schemaVersion !== SCHEMA_VERSION || !Array.isArray(exported.sources) || !Array.isArray(exported.claims)
-    || exported.sources.length === 0 || exported.claims.length === 0
+    || exported.claims.length === 0
     || (exported.inventoryComplete !== true && exported.inventoryComplete !== false && exported.inventoryComplete !== undefined)) {
     return ['input-invalid', '', 'Export version, inventory flag, sources or claims are invalid.']
   }
