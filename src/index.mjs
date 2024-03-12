@@ -175,7 +175,7 @@ function auditCore(exported, { scope, asOf, maxAgeDays, checkDeadline }) {
       const source = sources.get(id)
       if (source === undefined) {
         if (exported.inventoryComplete === true) findings.push(finding('citation-unresolved', pointer, 'Citation ID does not occur in the declared-complete approved-source export.'))
-        else supportUnknown = true
+        else { supportUnknown = true; usableUnknown = true }
         continue
       }
       resolved += 1

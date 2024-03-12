@@ -80,6 +80,23 @@ test('a complete empty source inventory proves a fabricated citation absent', ()
   assert.deepEqual(ids(auditCitations(input, options)), ['input-invalid'])
 })
 
+test('an absent citation in an incomplete inventory has unknown usable coverage', () => {
+  const input = goodExport()
+  input.claims[0].citations = ['FABRICATED']
+  const complete = auditCitations(input, options)
+  assert.equal(complete.status, 'fail')
+  assert.deepEqual(complete.coverage.usableCitations, { numerator: 0, denominator: 1 })
+  assert.deepEqual(ids(complete), ['claim-uncovered', 'citation-unresolved'])
+
+  input.inventoryComplete = false
+  const unknown = auditCitations(input, options)
+  assert.equal(unknown.status, 'incomplete')
+  assert.deepEqual(ids(unknown), ['inventory-unknown'])
+  assert.deepEqual(unknown.coverage.resolvedCitations, { numerator: null, denominator: 1 })
+  assert.deepEqual(unknown.coverage.usableCitations, { numerator: null, denominator: 1 })
+  assert.deepEqual(unknown.coverage.coveredClaims, { numerator: null, denominator: 1 })
+})
+
 test('a fabricated citation fails on its own even when another citation covers the claim', () => {
   const input = goodExport()
   input.claims[0].citations.push('FABRICATED')

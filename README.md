@@ -67,7 +67,7 @@ The report has three separate numerator/denominator pairs:
 | Metric | Numerator | Denominator |
 | --- | --- | --- |
 | `resolvedCitations` | Citation references found in a complete source inventory; null if inventory completeness is unknown. | All declared citation references. |
-| `usableCitations` | Resolved, approved, permitted and fresh references; null when a cited source's usability is unknown. | All declared citation references. |
+| `usableCitations` | Resolved, approved, permitted and fresh references; null when a cited source's usability or membership in an incomplete inventory is unknown. | All declared citation references. |
 | `coveredClaims` | Claims with at least one explicitly supporting usable citation; null when an uncovered claim might still be supported by unknown evidence. | All declared claims. |
 
 An invalid/unreadable export has all denominators null rather than pretending
