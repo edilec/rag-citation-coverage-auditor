@@ -54,6 +54,19 @@ test('bad CLI configuration has empty stdout; named unreadable input has incompl
   assert.equal(JSON.parse(missing.stdout).status, 'incomplete')
 })
 
+test('unknown option diagnostics do not echo bidi controls from the option', () => {
+  const ordinary = run('--input', 'unused', '--scope', 'public', '--as-of', '2026-09-20', '--wrong')
+  assert.equal(ordinary.status, 2)
+  assert.equal(ordinary.stdout, '')
+  assert.match(ordinary.stderr, /Unknown option/)
+  const hostile = run('--input', 'unused', '--scope', 'public', '--as-of', '2026-09-20', '--wrong\u202evisible')
+  assert.equal(hostile.status, 2)
+  assert.equal(hostile.stdout, '')
+  assert.match(hostile.stderr, /Unknown option/)
+  assert.ok(!hostile.stderr.includes('\u202e'))
+  assert.ok(!hostile.stderr.includes('--wrong'))
+})
+
 test('duplicate JSON keys cannot replace unknown inventory evidence with a pass', async (t) => {
   const root = await mkdtemp(join(tmpdir(), 'rag-duplicate-'))
   t.after(() => rm(root, { recursive: true, force: true }))
