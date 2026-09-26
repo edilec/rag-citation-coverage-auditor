@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1",
+  "inventoryComplete": true,
+  "sources": [
+    {
+      "id": "source-one",
+      "approved": true,
+      "permissions": ["public"],
+      "observedAt": "2026-09-15",
+      "supportsClaims": ["claim-one"]
+    }
+  ],
+  "claims": [{ "id": "claim-one", "citations": ["fabricated-id"] }]
+}
