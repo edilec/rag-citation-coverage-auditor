@@ -22,6 +22,9 @@ The passing export exits 0; the fabricated citation exits 1. stdout is one
 JSON report and a newline. Without `--json` a short human summary is on
 stderr. `--help` goes to stderr and leaves stdout empty.
 
+For a visual explanation of both synthetic exports and the report's limits,
+see the [public fixture walkthrough](https://edilec.com/open-source/rag-citation-coverage-auditor/).
+
 ## Export contract
 
 The named JSON input has this shape:
