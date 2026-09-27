@@ -127,3 +127,10 @@ The support relation is a claim *from the export*, not independently verified
 truth; inspect the source and relation provenance separately. Do not put real
 personal data or credentials in fixtures or reports. MIT licensed; see
 [LICENSE](./LICENSE).
+
+## About Edilec
+
+Edilec maintains this open-source tool. Teams planning AI document or knowledge
+workflows with citation and source controls can read about [Edilec's AI
+automation services](https://edilec.com/services/ai-automation/). The tool runs
+locally and does not require an Edilec account or service.
