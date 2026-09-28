@@ -10,9 +10,15 @@ It is a read-only reporter with zero runtime and development dependencies
 (Node.js 22+). It writes no files, fetches no source, resolves no host, contacts
 no provider or account, and does not decide whether a claim is actually true.
 
+[![Conceptual evidence panels connected by citation paths; open the public fixture walkthrough](https://edilec.com/brand/social/rag-citation-coverage-auditor-concept.jpg)](https://edilec.com/open-source/rag-citation-coverage-auditor/)
+
+Concept illustration only. The linked walkthrough shows the actual checked-in synthetic exports and their limits; the image is not a live evaluation result.
+
 ## Quick start
 
 ```sh
+git clone https://github.com/edilec/rag-citation-coverage-auditor.git
+cd rag-citation-coverage-auditor
 node bin/rag-citation-coverage-auditor.mjs --input examples/passing.json --scope public --as-of 2026-09-20
 node bin/rag-citation-coverage-auditor.mjs --input examples/failing.json --scope public --as-of 2026-09-20 --json
 npm run check
