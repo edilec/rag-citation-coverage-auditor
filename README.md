@@ -10,7 +10,7 @@ It is a read-only reporter with zero runtime and development dependencies
 (Node.js 22+). It writes no files, fetches no source, resolves no host, contacts
 no provider or account, and does not decide whether a claim is actually true.
 
-[![Evidence panels connected by citation paths; open the public fixture walkthrough](https://edilec.com/brand/social/rag-citation-coverage-auditor-concept.jpg)](https://edilec.com/open-source/rag-citation-coverage-auditor/)
+[![Evidence panels connected by citation paths; open the public fixture walkthrough](https://edilec.com/brand/social/rag-citation-coverage-auditor-social-preview.jpg)](https://edilec.com/open-source/rag-citation-coverage-auditor/)
 
 ## Quick start
 
